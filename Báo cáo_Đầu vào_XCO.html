@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Nhập báo cáo NKT - Dành cho công nhân" />
+  <title>Báo cáo_Đầu vào_XCO</title>
+  <link rel="stylesheet" href="styles.css?v=10" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>" />
+  <style>
+    /* Mobile specific overrides */
+    body { background-color: #f8fafc; padding-bottom: 20px; }
+    .worker-header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .worker-header h1 { font-size: 1.2rem; margin: 0; font-weight: 700; }
+    .worker-container { padding: 15px; max-width: 600px; margin: 0 auto; }
+    .op-selector-wrapper { margin-bottom: 15px; }
+    .op-btn { min-width: 110px; padding: 12px 8px; }
+    .form-group label { font-size: 0.9rem; }
+    .form-control { font-size: 1rem; padding: 12px; border-radius: 8px; }
+    .btn-submit-large {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 10px;
+      background-color: #10b981;
+      color: white;
+      border: none;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      margin-top: 20px;
+    }
+    .btn-submit-large:active { transform: translateY(2px); box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3); }
+    
+    #loading-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.8);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9999; display: none;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6;
+      border-radius: 50%; width: 40px; height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 10px;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .op-selector-wrapper { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="worker-header">
+  <div style="font-size: 1.8rem; line-height: 1;">📝</div>
+  <div>
+    <h1>Báo Cáo - Đầu Vào</h1>
+    <div style="font-size: 0.8rem; opacity: 0.9;">Xưởng CO&TBĐG</div>
+  </div>
+</div>
+
+<div class="worker-container">
+  
+  <div class="card op-selector-wrapper">
+    <div class="card-body" style="padding: 12px;">
+      <h3 style="font-size: 0.95rem; margin-bottom: 10px; color: #475569;">1. Chọn Nguyên Công</h3>
+      <div class="operation-selector" id="operation-selector">
+        <div class="op-btn active" onclick="selectOperationWorker('rua-ong')">
+          <div class="op-name">Rửa ống</div>
+          <div class="op-step">THƯỜNG DÙNG</div>
+        </div>
+        <div class="op-btn" onclick="selectOperationWorker('dau-vao')">
+          <div class="op-name">Đầu vào</div>
+        </div>
+        <div class="op-btn" onclick="selectOperationWorker('thong-nong')">
+          <div class="op-name">Thông nòng</div>
+        </div>
+        <div class="op-btn" onclick="selectOperationWorker('ndt')">
+          <div class="op-name">NDT</div>
+        </div>
+        <div class="op-btn" onclick="selectOperationWorker('lam-sach-ren')">
+          <div class="op-name">Làm sạch ren</div>
+        </div>
+        <div class="op-btn" onclick="selectOperationWorker('ep-thuy-luc')">
+          <div class="op-name">Ép thủy lực</div>
+        </div>
+        <div class="op-btn" onclick="selectOperationWorker('tien-ren-moi')">
+          <div class="op-name">Tiện ren</div>
+        </div>
+        <div class="op-btn" onclick="selectOperationWorker('thay-coupling')">
+          <div class="op-name">Thay coupling</div>
+        </div>
+        <div class="op-btn" onclick="selectOperationWorker('dong-goi')">
+          <div class="op-name">Đóng gói</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body" style="padding: 16px;">
+      <h3 style="font-size: 1.1rem; margin-bottom: 16px; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+        2. Nhập Thông Tin: <span id="op-title-display" style="color: #2563eb;">Rửa ống</span>
+      </h3>
+      
+      <form id="worker-form" onsubmit="event.preventDefault(); submitWorkerReport();">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>Ngày <span style="color: red;">*</span></label>
+            <input type="date" class="form-control" id="w-ngay" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>Ca <span style="color: red;">*</span></label>
+            <select class="form-control" id="w-ca" required>
+              <option>Hành chính</option>
+              <option>Ca 1</option>
+              <option>Ca 2</option>
+              <option>Ca 3</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Số ống (VD: 5000-5010 hoặc 50) <span style="color: red;">*</span></label>
+          <input type="text" class="form-control" id="w-so-ong" placeholder="Nhập số ống..." required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>Loại ống <span style="color: red;">*</span></label>
+            <select class="form-control" id="w-loai-ong" required>
+              <option>Ø60</option>
+              <option>Ø73</option>
+              <option>Ø73 NVTL</option>
+              <option>Ø89</option>
+              <option>Ø89 NVTL</option>
+              <option>Ø114</option>
+              <option>Ø114 NVTL</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>Loại xử lý <span style="color: red;">*</span></label>
+            <select class="form-control" id="w-loai-xl" required>
+              <option>Lần 1</option>
+              <option>Lần 2</option>
+              <option>Lần 3</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Các trường động tùy theo nguyên công -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div class="form-group" id="wg-so-lan-rua" style="margin-bottom: 0;">
+            <label>Số lần rửa</label>
+            <select class="form-control" id="w-so-lan-rua">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+          <div class="form-group" id="wg-dong-ho" style="margin-bottom: 0;">
+            <label>Đồng hồ nước</label>
+            <input type="text" class="form-control" id="w-dong-ho" placeholder="VD: 510-513">
+          </div>
+        </div>
+
+        <div class="form-group" id="wg-ma-bo" style="display: none;">
+          <label>Mã bó ống</label>
+          <input type="text" class="form-control" id="w-ma-bo" placeholder="Nhập mã bó...">
+        </div>
+        
+        <div class="form-group" id="wg-khoang" style="display: none;">
+          <label>Lấy từ khoang</label>
+          <input type="text" class="form-control" id="w-khoang" placeholder="Nhập khoang...">
+        </div>
+
+        <div class="form-group" id="wg-ap-suat" style="display: none;">
+          <label>Áp suất</label>
+          <input type="text" class="form-control" id="w-ap-suat" placeholder="Nhập áp suất...">
+        </div>
+
+        <div class="form-group">
+          <label>Người thực hiện 1 <span style="color: red;">*</span></label>
+          <select class="form-control" id="w-nguoi-1" required>
+            <option value="">-- Chọn nhân viên --</option>
+            <option value="Phạm Ngọc Đóa">Phạm Ngọc Đóa</option>
+            <option value="Trần Văn Diễn">Trần Văn Diễn</option>
+            <option value="Dương Huy Hùng">Dương Huy Hùng</option>
+            <option value="Dương Minh Quân">Dương Minh Quân</option>
+            <option value="Trịnh Hoài Đức">Trịnh Hoài Đức</option>
+            <option value="Bùi Quang Hạnh">Bùi Quang Hạnh</option>
+            <option value="Nguyễn Duy Sơn">Nguyễn Duy Sơn</option>
+            <option value="Nguyễn Cửu Long">Nguyễn Cửu Long</option>
+            <option value="Phùng Đình Nam">Phùng Đình Nam</option>
+            <option value="Nguyễn Xuân Thắng">Nguyễn Xuân Thắng</option>
+            <option value="Nguyễn Thanh Hiền">Nguyễn Thanh Hiền</option>
+            <option value="Tạ Ngọc Hòa">Tạ Ngọc Hòa</option>
+            <option value="Danh Xuân Đoán">Danh Xuân Đoán</option>
+            <option value="Hồ Xuân Hùng">Hồ Xuân Hùng</option>
+            <option value="Phạm Văn Định">Phạm Văn Định</option>
+            <option value="Lê Sỹ Tuyên">Lê Sỹ Tuyên</option>
+            <option value="Lê Văn Tùng">Lê Văn Tùng</option>
+            <option value="Nguyễn Đức Huy">Nguyễn Đức Huy</option>
+            <option value="Lê Đình Phú">Lê Đình Phú</option>
+            <option value="Vũ Văn Quyết">Vũ Văn Quyết</option>
+            <option value="Trần Minh Đạt">Trần Minh Đạt</option>
+            <option value="Lều Vĩnh An">Lều Vĩnh An</option>
+            <option value="Trần Văn Hậu">Trần Văn Hậu</option>
+            <option value="Vũ Toàn Trung">Vũ Toàn Trung</option>
+            <option value="Lê Đình Hùng">Lê Đình Hùng</option>
+            <option value="Thái Văn Ngọc">Thái Văn Ngọc</option>
+            <option value="Nguyễn Văn Dụy">Nguyễn Văn Dụy</option>
+            <option value="Nguyễn Thanh Hải">Nguyễn Thanh Hải</option>
+            <option value="Trần Quốc Vương">Trần Quốc Vương</option>
+            <option value="Trần Hữu Trí">Trần Hữu Trí</option>
+            <option value="Chu Tuấn Anh">Chu Tuấn Anh</option>
+            <option value="Nguyễn Công Phú">Nguyễn Công Phú</option>
+            <option value="Nguyễn Thành Nhơn">Nguyễn Thành Nhơn</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Người thực hiện 2</label>
+          <select class="form-control" id="w-nguoi-2">
+            <option value="">-- Chọn nhân viên (nếu có) --</option>
+            <option value="Phạm Ngọc Đóa">Phạm Ngọc Đóa</option>
+            <option value="Trần Văn Diễn">Trần Văn Diễn</option>
+            <option value="Dương Huy Hùng">Dương Huy Hùng</option>
+            <option value="Dương Minh Quân">Dương Minh Quân</option>
+            <option value="Trịnh Hoài Đức">Trịnh Hoài Đức</option>
+            <option value="Bùi Quang Hạnh">Bùi Quang Hạnh</option>
+            <option value="Nguyễn Duy Sơn">Nguyễn Duy Sơn</option>
+            <option value="Nguyễn Cửu Long">Nguyễn Cửu Long</option>
+            <option value="Phùng Đình Nam">Phùng Đình Nam</option>
+            <option value="Nguyễn Xuân Thắng">Nguyễn Xuân Thắng</option>
+            <option value="Nguyễn Thanh Hiền">Nguyễn Thanh Hiền</option>
+            <option value="Tạ Ngọc Hòa">Tạ Ngọc Hòa</option>
+            <option value="Danh Xuân Đoán">Danh Xuân Đoán</option>
+            <option value="Hồ Xuân Hùng">Hồ Xuân Hùng</option>
+            <option value="Phạm Văn Định">Phạm Văn Định</option>
+            <option value="Lê Sỹ Tuyên">Lê Sỹ Tuyên</option>
+            <option value="Lê Văn Tùng">Lê Văn Tùng</option>
+            <option value="Nguyễn Đức Huy">Nguyễn Đức Huy</option>
+            <option value="Lê Đình Phú">Lê Đình Phú</option>
+            <option value="Vũ Văn Quyết">Vũ Văn Quyết</option>
+            <option value="Trần Minh Đạt">Trần Minh Đạt</option>
+            <option value="Lều Vĩnh An">Lều Vĩnh An</option>
+            <option value="Trần Văn Hậu">Trần Văn Hậu</option>
+            <option value="Vũ Toàn Trung">Vũ Toàn Trung</option>
+            <option value="Lê Đình Hùng">Lê Đình Hùng</option>
+            <option value="Thái Văn Ngọc">Thái Văn Ngọc</option>
+            <option value="Nguyễn Văn Dụy">Nguyễn Văn Dụy</option>
+            <option value="Nguyễn Thanh Hải">Nguyễn Thanh Hải</option>
+            <option value="Trần Quốc Vương">Trần Quốc Vương</option>
+            <option value="Trần Hữu Trí">Trần Hữu Trí</option>
+            <option value="Chu Tuấn Anh">Chu Tuấn Anh</option>
+            <option value="Nguyễn Công Phú">Nguyễn Công Phú</option>
+            <option value="Nguyễn Thành Nhơn">Nguyễn Thành Nhơn</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="wg-tinh-trang">
+          <label>Tình trạng <span style="color: red;">*</span></label>
+          <select class="form-control" id="w-tinh-trang" required>
+            <option>Đạt</option>
+            <option>Rỗ thân, ăn mòn (loại)</option>
+            <option>Thiếu chiều dày (loại)</option>
+            <option>Tắc paraffin (loại)</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="wg-tinh-trang-dong-goi" style="display: none;">
+          <label>Tình trạng <span style="color: red;">*</span></label>
+          <div style="display: flex; gap: 20px; align-items: center; margin-top: 8px;">
+            <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 1.1rem;">
+              <input type="radio" name="w-dong-goi-tinh-trang" value="Đạt" checked style="width: 20px; height: 20px;"> Đạt
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; font-size: 1.1rem;">
+              <input type="radio" name="w-dong-goi-tinh-trang" value="Hỏng" style="width: 20px; height: 20px;"> Hỏng
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Ghi chú</label>
+          <textarea class="form-control" id="w-ghi-chu" rows="2" placeholder="Nhập ghi chú..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit-large">GỬI BÁO CÁO 🚀</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div style="font-weight: 600; color: #1e293b; font-size: 1.1rem;">Đang đồng bộ dữ liệu...</div>
+  <div style="font-size: 0.85rem; color: #64748b; margin-top: 5px;">Vui lòng không tắt trang</div>
+</div>
+
+<script>
+let currentWorkerOp = 'rua-ong';
+const GOOGLE_APP_SCRIPT_URL_KEY = 'nkt_sync_url_v4';
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Set default date to today
+    const today = new Date();
+    const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    if (document.getElementById('w-ngay')) {
+        document.getElementById('w-ngay').value = dateStr;
+    }
+    
+    // Auto restore last choices
+    const savedCa = localStorage.getItem('w_last_ca');
+    const savedNguoi1 = localStorage.getItem('w_last_nguoi1');
+    if (savedCa && document.getElementById('w-ca')) document.getElementById('w-ca').value = savedCa;
+    if (savedNguoi1 && document.getElementById('w-nguoi-1')) document.getElementById('w-nguoi-1').value = savedNguoi1;
+
+    // Trigger initial UI setup (Dùng biến toàn cục nếu có, mặc định là rua-ong)
+    const initialOp = 'dau-vao';
+    selectOperationWorker(initialOp);
+});
+
+const opTitles = {
+    'dau-vao': 'Đầu vào',
+    'rua-ong': 'Rửa ống',
+    'thong-nong': 'Thông nòng',
+    'ndt': 'NDT',
+    'lam-sach-ren': 'Làm sạch ren',
+    'ep-thuy-luc': 'Ép thủy lực',
+    'tien-ren-moi': 'Tiện ren',
+    'thay-coupling': 'Thay coupling',
+    'dong-goi': 'Đóng gói'
+};
+
+function selectOperationWorker(op) {
+    currentWorkerOp = op;
+    document.querySelectorAll('.op-btn').forEach(btn => btn.classList.remove('active'));
+    const btn = document.querySelector(`.op-btn[onclick="selectOperationWorker('${op}')"]`);
+    if(btn) btn.classList.add('active');
+    
+    document.getElementById('op-title-display').textContent = opTitles[op];
+
+    const wgSoLanRua = document.getElementById('wg-so-lan-rua');
+    const wgDongHo = document.getElementById('wg-dong-ho');
+    const wgMaBo = document.getElementById('wg-ma-bo');
+    const wgKhoang = document.getElementById('wg-khoang');
+    const wgApSuat = document.getElementById('wg-ap-suat');
+    const wgTinhTrang = document.getElementById('wg-tinh-trang');
+    const wgTinhTrangDongGoi = document.getElementById('wg-tinh-trang-dong-goi');
+
+    // Default states
+    wgSoLanRua.style.display = 'none';
+    wgDongHo.style.display = 'none';
+    wgMaBo.style.display = 'block';
+    wgKhoang.style.display = 'block';
+    wgApSuat.style.display = 'none';
+    wgTinhTrang.style.display = 'block';
+    wgTinhTrangDongGoi.style.display = 'none';
+
+    if (op === 'rua-ong') {
+        wgSoLanRua.style.display = 'block';
+        wgDongHo.style.display = 'block';
+        wgKhoang.style.display = 'none'; // Rửa ống ko cần khoang
+        wgMaBo.style.display = 'none';   // Rửa ống ko cần mã bó
+    } else if (op === 'thong-nong' || op === 'ep-thuy-luc' || op === 'ndt' || op === 'tien-ren-moi') {
+        wgKhoang.style.display = 'none';
+        wgMaBo.style.display = 'none';
+    }
+
+    if (op === 'ep-thuy-luc') {
+        wgApSuat.style.display = 'block';
+    }
+
+    if (op === 'dong-goi') {
+        wgMaBo.style.display = 'none'; // Đóng gói xài mã bó riêng
+        wgTinhTrang.style.display = 'none';
+        wgTinhTrangDongGoi.style.display = 'block';
+    }
+
+    // Update Tình trạng options
+    const fTinhTrang = document.getElementById('w-tinh-trang');
+    if(fTinhTrang) {
+        fTinhTrang.innerHTML = '';
+        if (op === 'ep-thuy-luc') {
+            fTinhTrang.innerHTML = `<option>Đạt</option><option>Xì box</option><option>Xì pin</option><option>Xì cả 2 đầu</option>`;
+        } else if (op === 'ndt') {
+            fTinhTrang.innerHTML = `<option>Đạt</option><option>Thiếu chiều dày (loại)</option><option>Khuyết tật ngang (loại)</option><option>Khuyết tật dọc (loại)</option><option>Rỗ thân, ăn mòn (loại)</option>`;
+        } else if (op === 'tien-ren-moi') {
+            fTinhTrang.innerHTML = `<option>Ống từ xưởng HR -> tiện ren mới</option><option>Ống lấy từ các giá chờ sửa chữa -> tiện ren mới</option>`;
+        } else if (op === 'lam-sach-ren') {
+            fTinhTrang.innerHTML = `<option>Đạt</option><option>Hỏng ren</option>`;
+        } else if (op === 'thay-coupling') {
+            fTinhTrang.innerHTML = `<option>Đạt</option><option>Hỏng coupling</option>`;
+        } else {
+            fTinhTrang.innerHTML = `<option>Đạt</option><option>Rỗ thân, ăn mòn (loại)</option><option>Thiếu chiều dày (loại)</option><option>Tắc paraffin (loại)</option>`;
+        }
+    }
+}
+
+function parsePipesArray(input) {
+    if (!input) return ["1"];
+    let text = input.toString().trim();
+    const parts = text.split(/[,;]/);
+    let result = [];
+    for (let p of parts) {
+        let pt = p.trim();
+        if (!pt) continue;
+        if (pt.includes('-')) {
+            const range = pt.split('-');
+            if (range.length === 2) {
+                const startStr = range[0].trim();
+                const endStr = range[1].trim();
+                const start = parseInt(startStr);
+                const end = parseInt(endStr);
+                if (!isNaN(start) && !isNaN(end) && start <= end && startStr.match(/^\d+$/) && endStr.match(/^\d+$/)) {
+                    for(let i = start; i <= end; i++) {
+                        result.push(i.toString());
+                    }
+                } else {
+                    result.push(pt);
+                }
+            } else result.push(pt);
+        } else {
+            result.push(pt);
+        }
+    }
+    return result.length > 0 ? result : ["1"];
+}
+
+async function submitWorkerReport() {
+    let syncUrl = localStorage.getItem(GOOGLE_APP_SCRIPT_URL_KEY);
+    
+    // Nếu chưa có URL đồng bộ, yêu cầu nhập
+    if (!syncUrl || syncUrl.trim() === '') {
+        syncUrl = prompt("Vui lòng dán đường link (URL) hệ thống đồng bộ Google Sheets vào đây để gửi dữ liệu:");
+        if (!syncUrl) return;
+        localStorage.setItem(GOOGLE_APP_SCRIPT_URL_KEY, syncUrl.trim());
+    }
+
+    const overlay = document.getElementById('loading-overlay');
+    overlay.style.display = 'flex';
+
+    try {
+        const soOngText = document.getElementById('w-so-ong').value;
+        const pipesArray = parsePipesArray(soOngText);
+
+        let tinhTrangValue = document.getElementById('w-tinh-trang').value;
+        let maBoValue = document.getElementById('w-ma-bo') ? document.getElementById('w-ma-bo').value : '';
+
+        if (currentWorkerOp === 'dong-goi') {
+            tinhTrangValue = document.querySelector('input[name="w-dong-goi-tinh-trang"]:checked').value;
+        }
+
+        const timestamp = Date.now();
+        const ngay = document.getElementById('w-ngay').value;
+        const ca = document.getElementById('w-ca').value;
+        const nguyenCong = opTitles[currentWorkerOp];
+        const loaiXl = document.getElementById('w-loai-xl').value;
+        const soLanRua = document.getElementById('w-so-lan-rua').value;
+        const dongHoNuoc = document.getElementById('w-dong-ho').value;
+        const loaiOng = document.getElementById('w-loai-ong').value;
+        const khoang = document.getElementById('w-khoang').value;
+        const apSuat = document.getElementById('w-ap-suat').value;
+        const nguoi1 = document.getElementById('w-nguoi-1').value;
+        const nguoi2 = document.getElementById('w-nguoi-2').value;
+        const ghiChu = document.getElementById('w-ghi-chu').value;
+        const timeIso = new Date().toISOString();
+
+        const reports = pipesArray.map((pipeName, index) => {
+            return {
+                id: timestamp + index,
+                ngay: ngay,
+                ca: ca,
+                nguyenCong: nguyenCong,
+                soOngText: pipeName,
+                soOngCount: 1,
+                loaiXl: loaiXl,
+                soLanRua: soLanRua,
+                dongHoNuoc: dongHoNuoc,
+                loaiOng: loaiOng,
+                maBo: maBoValue,
+                khoang: khoang,
+                apSuat: apSuat,
+                nguoi1: nguoi1,
+                nguoi2: nguoi2,
+                tinhTrang: tinhTrangValue,
+                ghiChu: pipesArray.length > 1 ? (ghiChu ? ghiChu + ` (Lô gốc: ${soOngText})` : `Lô gốc: ${soOngText}`) : ghiChu,
+                timestamp: timeIso
+            };
+        });
+
+        const reportData = {
+            action: 'add_reports',
+            reports: reports
+        };
+
+        // Lưu tạm settings
+        localStorage.setItem('w_last_ca', reportData.reports[0].ca);
+        localStorage.setItem('w_last_nguoi1', reportData.reports[0].nguoi1);
+
+        console.log("Đang gửi đi:", reportData);
+
+        const response = await fetch(syncUrl, {
+            method: 'POST',
+            mode: 'no-cors', // Sử dụng no-cors để tránh lỗi CORS khi gọi Google Apps Script từ client
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(reportData)
+        });
+
+        // Với no-cors, response sẽ luôn trả về opaque, ta cứ coi như thành công nếu ko ném lỗi mạng
+        overlay.style.display = 'none';
+        alert('✅ Đã gửi báo cáo thành công!');
+        
+        // Reset vài trường
+        document.getElementById('w-so-ong').value = '';
+        if(document.getElementById('w-ma-bo')) document.getElementById('w-ma-bo').value = '';
+        if(document.getElementById('w-ghi-chu')) document.getElementById('w-ghi-chu').value = '';
+        
+    } catch (error) {
+        overlay.style.display = 'none';
+        console.error(error);
+        const resetUrl = confirm("❌ Gửi thất bại! Có thể đường link đồng bộ bị sai. Bạn có muốn đổi đường link khác không?");
+        if (resetUrl) {
+            localStorage.removeItem(GOOGLE_APP_SCRIPT_URL_KEY);
+        }
+    }
+}
+
+</script>
+
+<!-- Reset URL Button injected by Antigravity -->
+<div style="position: fixed; bottom: 10px; right: 10px; z-index: 9999;">
+    <button onclick="localStorage.removeItem('nkt_sync_url_v2'); localStorage.removeItem('nkt_sync_url_v3'); localStorage.removeItem('nkt_sync_url_v4'); localStorage.removeItem('nkt_sync_url'); alert('Đã xóa link đồng bộ cũ. Vui lòng tải lại trang và nhập link mới!'); location.reload();" 
+            style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: sans-serif; font-size: 12px; font-weight: bold;">
+        🔄 Đổi Link Đồng Bộ
+    </button>
+</div>
+
+</body>
+</html>
