@@ -1,0 +1,45 @@
+0: 📊 BẢNG TỔNG HỢP SỐ LƯỢNG & SỐ LOẠI ỐNG NHẬN THEO THÁNG -> Tháng
+1: Unnamed: 1 -> Ø60
+2: Unnamed: 2 -> Ø73
+3: Unnamed: 3 -> Ø89
+4: Unnamed: 4 -> Ø89 NVTL
+5: Unnamed: 5 -> Ø114
+6: Unnamed: 6 -> Ø114 NVTL
+7: Unnamed: 7 -> Tổng
+8: Unnamed: 8 -> nan
+9: Unnamed: 9 -> nan
+10: Unnamed: 10 -> nan
+11: Unnamed: 11 -> nan
+12: Unnamed: 12 -> nan
+13: Unnamed: 13 -> nan
+14: BẢNG TỔNG HỢP THÔNG TIN ỐNG TỪ BBGN -> Stt
+15: Unnamed: 15 -> Size
+16: Unnamed: 16 -> Đvt
+17: Unnamed: 17 -> Số lượng
+18: Unnamed: 18 -> Mã bó
+19: Unnamed: 19 -> Từ giếng
+20: Unnamed: 20 -> Từ giàn
+21: Unnamed: 21 -> Số BBGN
+22: Unnamed: 22 -> Ngày nhận
+23: Unnamed: 23 -> Người nhận
+24: Unnamed: 24 -> Ghi chú
+25: Unnamed: 25 -> VỊ trí lưu ống
+26: Unnamed: 26 -> Ngày chuẩn
+27: Unnamed: 27 -> Ghi chú ống mới
+28: Unnamed: 28 -> __Giếng1__
+29: Unnamed: 29 -> __Giếng2__
+30: Unnamed: 30 -> __Giếng3__
+31: Unnamed: 31 -> __Giếng4__
+32: Unnamed: 32 -> __Giếng5__
+33: Unnamed: 33 -> __Giếng6__
+34: Unnamed: 34 -> __Giếng7__
+35: Unnamed: 35 -> __Giếng8__
+36: Unnamed: 36 -> __Giàn1__
+37: Unnamed: 37 -> __Giàn2__
+38: Unnamed: 38 -> __Giàn3__
+39: Unnamed: 39 -> __Giàn4__
+40: Unnamed: 40 -> __Giàn5__
+41: Unnamed: 41 -> __Giàn6__
+42: Unnamed: 42 -> __Giàn7__
+43: Unnamed: 43 -> __Giàn8__
+44: Unnamed: 44 -> nan

@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ứng dụng báo cáo ngày theo dõi ống NKT - Xưởng CO&TBĐG" />
+  <title>Báo Cáo Ngày - Theo Dõi Ống NKT | X.CO&TBĐG</title>
+  <link rel="stylesheet" href="styles.css?v=9" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>" />
+</head>
+<body>
+
+<!-- Toast Container -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Sidebar Overlay (mobile) -->
+<div class="sidebar-overlay"></div>
+
+<div class="app-layout">
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <img src="logo2025.png" alt="Vietsovpetro Logo" style="width: 130px; height: auto; object-fit: contain; margin-bottom: -10px; position: relative; z-index: 1;">
+        <div class="logo-text" style="text-align: center; position: relative; z-index: 2;">
+          <h1 style="font-size: 1.25rem; color: #1e3a8a; font-weight: 900; letter-spacing: 0.5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); margin: 0;">NKT Report</h1>
+          <p style="color: var(--accent-blue); font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px;">X.CO&TBĐG</p>
+          
+          <div class="author-card">
+            <div class="author-header">
+              <span class="author-label">Thiết kế</span>
+              <div class="author-name">✍️ Lê Văn Tùng</div>
+            </div>
+            <div class="author-info-row">
+              <span class="author-info-label">Danh số:</span>
+              <span class="author-info-value">22149</span>
+            </div>
+            <div class="author-info-row">
+              <span class="author-info-label">Chức danh:</span>
+              <span class="author-info-value">Thợ nguội B4</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Menu chính</div>
+
+      <div class="nav-item active" data-page="dashboard" id="nav-dashboard">
+        <span class="nav-icon">📊</span>
+        <span>Tổng quan</span>
+      </div>
+      <div class="nav-item" data-page="plan" id="nav-plan">
+        <span class="nav-icon">📅</span>
+        <span>Kế hoạch</span>
+      </div>
+
+      <div class="nav-item" data-page="report" id="nav-report">
+        <span class="nav-icon">📝</span>
+        <span>Nhập báo cáo</span>
+        <span class="nav-badge" id="report-badge" style="display:none">0</span>
+      </div>
+
+      <div class="nav-item" data-page="history" id="nav-history">
+        <span class="nav-icon">📋</span>
+        <span>Lịch sử</span>
+      </div>
+
+      <div class="nav-item" onclick="exportExcel()">
+        <span class="nav-icon">📥</span>
+        <span>Xuất báo cáo</span>
+      </div>
+      <div class="nav-item" onclick="showInventory()">
+        <span class="nav-icon">📦</span>
+        <span>Tồn kho</span>
+      </div>
+
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="datetime">
+        <div class="date" id="sidebar-date"></div>
+        <div id="sidebar-time"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+  <main class="main-content">
+
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-toggle" id="mobile-toggle">☰</button>
+        <h2 class="page-title">
+          <span id="page-title-text">📊 Tổng quan</span>
+          <span id="page-title-sub"></span>
+        </h2>
+      </div>
+      <div class="header-right">
+        <button class="header-btn" onclick="syncFromCloud()" style="color: #2563eb; border-color: #bfdbfe; background-color: #eff6ff;">
+          ☁️ <span class="hide-mobile">Đồng bộ</span>
+        </button>
+        <button class="header-btn" onclick="exportExcel()">
+          📥 <span class="hide-mobile">Xuất Excel</span>
+        </button>
+        <button class="header-btn" onclick="goToReport()">
+          ➕ <span class="hide-mobile">Nhập mới</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- ═══════ PAGE: DASHBOARD ═══════ -->
+      <section id="page-dashboard" class="page active">
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card violet">
+            <div class="stat-header">
+              <span class="stat-label">Tháng này</span>
+              <div class="stat-icon">📊</div>
+            </div>
+            <div class="stat-value" id="stat-month">0</div>
+            <div class="stat-sub" id="stat-month-sub">Tháng</div>
+          </div>
+
+          <div class="stat-card emerald">
+            <div class="stat-header">
+              <span class="stat-label">Hôm nay</span>
+              <div class="stat-icon">📅</div>
+            </div>
+            <div class="stat-value" id="stat-today">0</div>
+            <div class="stat-sub" id="stat-today-sub">0 báo cáo hôm nay</div>
+          </div>
+
+          <div class="stat-card blue">
+            <div class="stat-header">
+              <span class="stat-label">Tổng ống</span>
+              <div class="stat-icon">📦</div>
+            </div>
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-sub" id="stat-total-sub">0 báo cáo</div>
+          </div>
+
+          <div class="stat-card amber">
+            <div class="stat-header">
+              <span class="stat-label">Ống đạt</span>
+              <div class="stat-icon">✅</div>
+            </div>
+            <div class="stat-value" id="stat-ok">0</div>
+            <div class="stat-sub">Tình trạng OK</div>
+          </div>
+
+          <div class="stat-card orange">
+            <div class="stat-header">
+              <span class="stat-label">Ống chờ sửa</span>
+              <div class="stat-icon">🔧</div>
+            </div>
+            <div class="stat-value" id="stat-repair">0</div>
+            <div class="stat-sub">Tình trạng CL, HR, ...</div>
+          </div>
+
+          <div class="stat-card rose">
+            <div class="stat-header">
+              <span class="stat-label">Ống hỏng</span>
+              <div class="stat-icon">❌</div>
+            </div>
+            <div class="stat-value" id="stat-fail">0</div>
+            <div class="stat-sub">Tình trạng TR, XB, XP</div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div style="margin-bottom: 28px; display: grid; grid-template-columns: 1.1fr 1.6fr 0.9fr; gap: 20px;">
+          <!-- Chart 1: Status -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><span class="icon">📊</span> Tỷ lệ trạng thái ống</h3>
+            </div>
+            <div class="card-body" style="display: flex; justify-content: center; align-items: center; height: 300px;">
+              <canvas id="chart-status"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 2: Operations -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><span class="icon">📈</span> Theo nguyên công</h3>
+            </div>
+            <div class="card-body" style="display: flex; justify-content: center; align-items: center; height: 300px;">
+              <canvas id="chart-operations"></canvas>
+            </div>
+          </div>
+
+          <!-- Table: Average per day -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><span class="icon">📋</span> Trung bình số ống/ngày</h3>
+            </div>
+            <div class="card-body" style="padding: 0; max-height: 300px; overflow-y: auto;">
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="text-align: left;">Nguyên công</th>
+                      <th>TB/ngày</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-avg-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tables Section -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="margin: 0; color: var(--text-primary);">Dữ liệu chi tiết</h3>
+          <button class="btn btn-sm btn-primary" onclick="openPlanModal()">🎯 Cài đặt Kế hoạch</button>
+        </div>
+        
+        <div style="margin-bottom: 28px; display: grid; grid-template-columns: 1.1fr 1.8fr 0.85fr; gap: 20px;">
+          <!-- Table 1: Size -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><span class="icon">📏</span> Theo Size ống</h3>
+            </div>
+            <div class="card-body" style="padding: 0; max-height: 350px; overflow-y: auto;">
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="text-align: left;">Size</th>
+                      <th>KH</th>
+                      <th>Tổng</th>
+                      <th>TP</th>
+                      <th>Sửa</th>
+                      <th>Hỏng</th>
+                      <th>% HTKH</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-size-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <!-- Table 2: By Date -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><span class="icon">📅</span> Theo ngày</h3>
+            </div>
+            <div class="card-body" style="padding: 0; max-height: 350px; overflow-y: auto;">
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Ngày</th>
+                      <th>Kế hoạch (KH)</th>
+                      <th>Tổng</th>
+                      <th>Thành phẩm (TP)</th>
+                      <th>Sửa</th>
+                      <th>Hỏng</th>
+                      <th>% HTKH</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-date-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Table 3: Errors -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><span class="icon">❌</span> Thống kê mã lỗi</h3>
+            </div>
+            <div class="card-body" style="padding: 0; max-height: 350px; overflow-y: auto;">
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Mã lỗi</th>
+                      <th style="text-align: left;">Tên lỗi</th>
+                      <th>SL</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-errors-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent & Op Summary -->
+        <div class="grid-2" style="margin-bottom: 28px;">
+          <!-- Operation Summary -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><span class="icon">⚙️</span> Thống kê theo nguyên công</h3>
+            </div>
+            <div class="card-body">
+              <div class="op-summary-grid" id="op-summary"></div>
+            </div>
+          </div>
+
+          <!-- Recent Reports -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><span class="icon">🕐</span> Báo cáo gần đây</h3>
+              <button class="btn btn-sm btn-outline" onclick="navigateTo('history')">Xem tất cả →</button>
+            </div>
+            <div class="card-body" style="max-height: 350px; overflow-y: auto;">
+              <div class="recent-list" id="recent-reports"></div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ═══════ PAGE: PLAN ═══════ -->
+      <section id="page-plan" class="page">
+        <div class="card">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="card-title"><span class="icon">📅</span> Bảng kế hoạch sản xuất tháng</h3>
+            <button class="btn btn-sm btn-primary" onclick="openPlanModal()">⚙️ Cài đặt Kế hoạch</button>
+          </div>
+          <div class="card-body">
+            <div style="margin-bottom: 15px; display: flex; gap: 15px; align-items: center;">
+              <label>Tháng hiển thị:</label>
+              <input type="month" class="form-control" id="plan-display-month" onchange="renderPlanTable()" style="max-width: 200px;">
+            </div>
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Ngày</th>
+                    <th style="text-align: left;">Size ống</th>
+                    <th>Kế hoạch (KH)</th>
+                    <th>Tổng đã làm</th>
+                    <th>Thành phẩm (TP)</th>
+                    <th>Sửa</th>
+                    <th>Hỏng</th>
+                    <th>% HTKH</th>
+                    <th>Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="table-plan-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ PAGE: REPORT ═══════ -->
+      <section id="page-report" class="page">
+
+        <!-- Operation Selector -->
+        <div class="card" style="margin-bottom: 20px;">
+          <div class="card-header">
+            <h3 class="card-title"><span class="icon">⚙️</span> Chọn nguyên công</h3>
+          </div>
+          <div class="card-body">
+            <div class="operation-selector" id="operation-selector">
+              <div class="op-btn active" onclick="selectOperation('dau-vao')">
+                <div class="op-name">Đầu vào</div>
+                <div class="op-step">BƯỚC 1</div>
+              </div>
+              <div class="op-btn" onclick="selectOperation('rua-ong')">
+                <div class="op-name">Rửa ống</div>
+                <div class="op-step">BƯỚC 2</div>
+              </div>
+              <div class="op-btn" onclick="selectOperation('thong-nong')">
+                <div class="op-name">Thông nòng</div>
+                <div class="op-step">BƯỚC 3</div>
+              </div>
+              <div class="op-btn" onclick="selectOperation('ndt')">
+                <div class="op-name">NDT</div>
+                <div class="op-step">BƯỚC 4</div>
+              </div>
+              <div class="op-btn" onclick="selectOperation('lam-sach-ren')">
+                <div class="op-name">Làm sạch, calip ren</div>
+                <div class="op-step">BƯỚC 5</div>
+              </div>
+              <div class="op-btn" onclick="selectOperation('ep-thuy-luc')">
+                <div class="op-name">Ép thủy lực</div>
+                <div class="op-step">BƯỚC 6</div>
+              </div>
+              <div class="op-btn" onclick="selectOperation('tien-ren-moi')">
+                <div class="op-name">Tiện ren mới</div>
+                <div class="op-step">BƯỚC 7</div>
+              </div>
+              <div class="op-btn" onclick="selectOperation('thay-coupling')">
+                <div class="op-name">Thay coupling</div>
+                <div class="op-step">BƯỚC 8</div>
+              </div>
+              <div class="op-btn" onclick="selectOperation('dong-goi')">
+                <div class="op-name">Đóng gói</div>
+                <div class="op-step">BƯỚC 9</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Form -->
+        <div class="card" style="margin-bottom: 20px;">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="card-title"><span class="icon">📝</span> Chi tiết báo cáo</h3>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-outline btn-sm" onclick="resetForm()">🔄 Đặt lại</button>
+              <button class="btn btn-success btn-sm" onclick="submitReport()" id="btn-submit" style="padding: 6px 16px; font-size: 0.85rem; font-weight: bold; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);">💾 Lưu báo cáo</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="operation-form">
+              <h4 id="operation-title" style="margin-bottom: 16px; color: var(--text-primary); font-size: 1rem;">Đầu vào</h4>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Ngày báo cáo <span style="color: red;">*</span></label>
+                  <input type="text" class="form-control" id="f-ngay">
+                </div>
+                <div class="form-group">
+                  <label>Ca làm việc <span style="color: red;">*</span></label>
+                  <select class="form-control" id="f-ca">
+                    <option>Hành chính</option>
+                    <option>Ca 1</option>
+                    <option>Ca 2</option>
+                    <option>Ca 3</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Số ống <span style="color: red;">*</span></label>
+                  <input type="text" id="so-ong-input" class="form-control" placeholder="VD: 5000-5010 hoặc 50" oninput="calculatePipes()">
+                  <div id="so-ong-hint" style="font-size: 0.75rem; color: var(--accent-blue); margin-top: 4px;"></div>
+                </div>
+                <div class="form-group">
+                  <label>Loại xử lý <span style="color: red;">*</span></label>
+                  <select class="form-control" id="f-loai-xl">
+                    <option>Lần 1</option>
+                    <option>Lần 2</option>
+                    <option>Lần 3</option>
+                  </select>
+                </div>
+                <div class="form-group" id="fg-so-lan-rua" style="display: none;">
+                  <label>Số lần rửa <span style="color: red;">*</span></label>
+                  <select class="form-control" id="f-so-lan-rua">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
+                </div>
+                <div class="form-group" id="fg-dong-ho-nuoc" style="display: none;">
+                  <label>Đồng hồ nước (VD: 510-513)</label>
+                  <input type="text" class="form-control" id="f-dong-ho-nuoc" placeholder="Nhập chỉ số (VD: 510-513)..." onblur="formatDongHoNuoc(this)">
+                </div>
+                <div class="form-group">
+                  <label>Loại ống <span style="color: red;">*</span></label>
+                  <select class="form-control" id="f-loai-ong">
+                    <option>Ø60</option>
+                    <option>Ø73</option>
+                    <option>Ø73 NVTL</option>
+                    <option>Ø89</option>
+                    <option>Ø89 NVTL</option>
+                    <option>Ø114</option>
+                    <option>Ø114 NVTL</option>
+                  </select>
+                </div>
+                <div class="form-group" id="fg-ma-bo">
+                  <label>Mã bó</label>
+                  <input type="text" class="form-control" id="f-ma-bo" placeholder="Nhập mã bó..." oninput="updateBundleInfo()">
+                  <div id="bundle-info" style="margin-top: 8px; font-size: 0.85rem; color: var(--text-muted); display: none;">
+                      <strong>Từ giếng:</strong> <span id="info-gieng" style="color: var(--accent-blue);"></span> | 
+                      <strong>Từ giàn:</strong> <span id="info-gian" style="color: var(--accent-blue);"></span> | 
+                      <strong>Số BBGN:</strong> <span id="info-bbgn" style="color: var(--accent-blue);"></span>
+                  </div>
+                </div>
+                <div class="form-group" id="fg-ma-bo-thanh-pham" style="display: none;">
+                  <label>Mã bó thành phẩm</label>
+                  <input type="text" class="form-control" id="f-ma-bo-thanh-pham" placeholder="Nhập mã bó thành phẩm..." oninput="updateBundleInfo()">
+                </div>
+                <div class="form-group" id="fg-ma-bo-hong" style="display: none;">
+                  <label>Mã bó ống hỏng</label>
+                  <input type="text" class="form-control" id="f-ma-bo-hong" placeholder="Nhập mã bó ống hỏng..." oninput="updateBundleInfo()">
+                </div>
+                
+                <div class="form-group" id="fg-khoang">
+                  <label>Lấy từ khoang</label>
+                  <input type="text" class="form-control" id="f-khoang" placeholder="Nhập lấy từ khoang...">
+                </div>
+                <div class="form-group" id="fg-ap-suat" style="display: none;">
+                  <label>Áp suất</label>
+                  <input type="text" class="form-control" id="f-ap-suat" placeholder="Nhập áp suất...">
+                </div>
+                <div class="form-group">
+                  <label>Người thực hiện 1 <span style="color: red;">*</span></label>
+                  <select class="form-control" id="f-nguoi-1">
+                    <option value="">-- Chọn nhân viên --</option>
+                    <option value="Phạm Ngọc Đóa">Phạm Ngọc Đóa</option>
+<option value="Trần Văn Diễn">Trần Văn Diễn</option>
+<option value="Dương Huy Hùng">Dương Huy Hùng</option>
+<option value="Dương Minh Quân">Dương Minh Quân</option>
+<option value="Trịnh Hoài Đức">Trịnh Hoài Đức</option>
+<option value="Bùi Quang Hạnh">Bùi Quang Hạnh</option>
+<option value="Nguyễn Duy Sơn">Nguyễn Duy Sơn</option>
+<option value="Nguyễn Cửu Long">Nguyễn Cửu Long</option>
+<option value="Phùng Đình Nam">Phùng Đình Nam</option>
+<option value="Nguyễn Xuân Thắng">Nguyễn Xuân Thắng</option>
+<option value="Nguyễn Thanh Hiền">Nguyễn Thanh Hiền</option>
+<option value="Tạ Ngọc Hòa">Tạ Ngọc Hòa</option>
+<option value="Danh Xuân Đoán">Danh Xuân Đoán</option>
+<option value="Hồ Xuân Hùng">Hồ Xuân Hùng</option>
+<option value="Phạm Văn Định">Phạm Văn Định</option>
+<option value="Lê Sỹ Tuyên">Lê Sỹ Tuyên</option>
+<option value="Lê Văn Tùng">Lê Văn Tùng</option>
+<option value="Nguyễn Đức Huy">Nguyễn Đức Huy</option>
+<option value="Lê Đình Phú">Lê Đình Phú</option>
+<option value="Vũ Văn Quyết">Vũ Văn Quyết</option>
+<option value="Trần Minh Đạt">Trần Minh Đạt</option>
+<option value="Lều Vĩnh An">Lều Vĩnh An</option>
+<option value="Trần Văn Hậu">Trần Văn Hậu</option>
+<option value="Vũ Toàn Trung">Vũ Toàn Trung</option>
+<option value="Lê Đình Hùng">Lê Đình Hùng</option>
+<option value="Thái Văn Ngọc">Thái Văn Ngọc</option>
+<option value="Nguyễn Văn Dụy">Nguyễn Văn Dụy</option>
+<option value="Nguyễn Thanh Hải">Nguyễn Thanh Hải</option>
+<option value="Trần Quốc Vương">Trần Quốc Vương</option>
+<option value="Trần Hữu Trí">Trần Hữu Trí</option>
+<option value="Chu Tuấn Anh">Chu Tuấn Anh</option>
+<option value="Nguyễn Công Phú">Nguyễn Công Phú</option>
+<option value="Nguyễn Thành Nhơn">Nguyễn Thành Nhơn</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Người thực hiện 2</label>
+                  <select class="form-control" id="f-nguoi-2">
+                    <option value="">-- Chọn nhân viên --</option>
+                    <option value="Phạm Ngọc Đóa">Phạm Ngọc Đóa</option>
+<option value="Trần Văn Diễn">Trần Văn Diễn</option>
+<option value="Dương Huy Hùng">Dương Huy Hùng</option>
+<option value="Dương Minh Quân">Dương Minh Quân</option>
+<option value="Trịnh Hoài Đức">Trịnh Hoài Đức</option>
+<option value="Bùi Quang Hạnh">Bùi Quang Hạnh</option>
+<option value="Nguyễn Duy Sơn">Nguyễn Duy Sơn</option>
+<option value="Nguyễn Cửu Long">Nguyễn Cửu Long</option>
+<option value="Phùng Đình Nam">Phùng Đình Nam</option>
+<option value="Nguyễn Xuân Thắng">Nguyễn Xuân Thắng</option>
+<option value="Nguyễn Thanh Hiền">Nguyễn Thanh Hiền</option>
+<option value="Tạ Ngọc Hòa">Tạ Ngọc Hòa</option>
+<option value="Danh Xuân Đoán">Danh Xuân Đoán</option>
+<option value="Hồ Xuân Hùng">Hồ Xuân Hùng</option>
+<option value="Phạm Văn Định">Phạm Văn Định</option>
+<option value="Lê Sỹ Tuyên">Lê Sỹ Tuyên</option>
+<option value="Lê Văn Tùng">Lê Văn Tùng</option>
+<option value="Nguyễn Đức Huy">Nguyễn Đức Huy</option>
+<option value="Lê Đình Phú">Lê Đình Phú</option>
+<option value="Vũ Văn Quyết">Vũ Văn Quyết</option>
+<option value="Trần Minh Đạt">Trần Minh Đạt</option>
+<option value="Lều Vĩnh An">Lều Vĩnh An</option>
+<option value="Trần Văn Hậu">Trần Văn Hậu</option>
+<option value="Vũ Toàn Trung">Vũ Toàn Trung</option>
+<option value="Lê Đình Hùng">Lê Đình Hùng</option>
+<option value="Thái Văn Ngọc">Thái Văn Ngọc</option>
+<option value="Nguyễn Văn Dụy">Nguyễn Văn Dụy</option>
+<option value="Nguyễn Thanh Hải">Nguyễn Thanh Hải</option>
+<option value="Trần Quốc Vương">Trần Quốc Vương</option>
+<option value="Trần Hữu Trí">Trần Hữu Trí</option>
+<option value="Chu Tuấn Anh">Chu Tuấn Anh</option>
+<option value="Nguyễn Công Phú">Nguyễn Công Phú</option>
+<option value="Nguyễn Thành Nhơn">Nguyễn Thành Nhơn</option>
+                  </select>
+                </div>
+                <div class="form-group" id="fg-tinh-trang">
+                  <label>Tình trạng <span style="color: red;">*</span></label>
+                  <select class="form-control" id="f-tinh-trang">
+                    <option>Đạt</option>
+                    <option>Rỗ thân, ăn mòn (loại)</option>
+                    <option>Thiếu chiều dày (loại)</option>
+                    <option>Tắc paraffin (loại)</option>
+                  </select>
+                </div>
+                <div class="form-group" id="fg-tinh-trang-dong-goi" style="display: none;">
+                  <label>Tình trạng <span style="color: red;">*</span></label>
+                  <div style="display: flex; gap: 20px; align-items: center; margin-top: 8px;">
+                    <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer;">
+                      <input type="radio" name="dong-goi-tinh-trang" value="Đạt" checked onchange="toggleDongGoiMaBo()"> Đạt
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer;">
+                      <input type="radio" name="dong-goi-tinh-trang" value="Hỏng" onchange="toggleDongGoiMaBo()"> Hỏng
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group" style="margin-top: 16px;">
+                <label>Ghi chú</label>
+                <textarea class="form-control" id="f-ghi-chu" placeholder="Nhập ghi chú thêm (nếu có)..." rows="3"></textarea>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+
+      </section>
+
+      <!-- ═══════ PAGE: HISTORY ═══════ -->
+      <section id="page-history" class="page">
+
+        <!-- Filters -->
+        <div class="card" style="margin-bottom: 20px;">
+          <div class="card-header">
+            <h3 class="card-title"><span class="icon">🔍</span> Bộ lọc</h3>
+            <span style="font-size: 0.8rem; color: var(--text-muted);" id="history-count">0 kết quả</span>
+          </div>
+          <div class="card-body">
+            <div class="filter-bar">
+              <input type="text" class="form-control search-input" id="filter-search"
+                     placeholder="Tìm theo tên, mã bó, ghi chú..."
+                     oninput="applyHistoryFilters()" />
+              <input type="date" class="form-control" id="filter-date"
+                     onchange="applyHistoryFilters()" />
+              <select class="form-control" id="filter-operation">
+                <option value="">Tất cả nguyên công</option>
+                <option value="dau-vao">Đầu vào</option>
+                <option value="rua-ong">Rửa ống</option>
+                <option value="thong-nong">Thông nòng</option>
+                <option value="ndt">NDT</option>
+                <option value="lam-sach-ren">Làm sạch, calip ren</option>
+                <option value="ep-thuy-luc">Ép thủy lực</option>
+                <option value="tien-ren-moi">Tiện ren mới</option>
+                <option value="thay-coupling">Thay coupling</option>
+                <option value="dong-goi">Đóng gói</option>
+              </select>
+              <button class="btn btn-sm btn-outline" onclick="
+                document.getElementById('filter-date').value='';
+                document.getElementById('filter-operation').value='';
+                document.getElementById('filter-search').value='';
+                applyHistoryFilters();
+              ">✕ Xóa bộ lọc</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- History Table -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><span class="icon">📋</span> Danh sách báo cáo</h3>
+            <button class="btn btn-sm btn-primary" onclick="exportExcel()">📥 Xuất Excel</button>
+          </div>
+          <div class="card-body" style="padding: 0; max-height: calc(100vh - 220px); overflow-y: auto;">
+            <div class="data-table-wrapper">
+              <table class="data-table" id="history-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Ngày</th>
+                    <th>Ca</th>
+                    <th>Nguyên công</th>
+                    <th>SIZE ỐNG</th>
+                    <th>BÓ ỐNG</th>
+                    <th>TỪ GIẾNG</th>
+                    <th>TỪ GIÀN</th>
+                    <th>SỐ BBGN</th>
+                    <th>NGƯỜI THỰC HIỆN</th>
+                    <th>Tình trạng</th>
+                    <th>SỐ LƯỢNG ỐNG</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="history-table-body">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- ═══════ MODAL: Report Detail ═══════ -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-title">Chi tiết báo cáo</h3>
+      <button class="modal-close" onclick="closeModal('modal-detail')">✕</button>
+    </div>
+    <div class="modal-body" id="modal-detail-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-detail')">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Plan -->
+<div class="modal-overlay" id="modal-plan">
+  <div class="modal" style="max-width: 400px; margin: 50px auto;">
+    <div class="modal-header">
+      <h2 class="modal-title">🎯 Kế hoạch sản xuất tháng</h2>
+      <button class="modal-close" onclick="closeModal('modal-plan')">✕</button>
+    </div>
+    <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label>Chọn ngày cài đặt:</label>
+        <input type="date" class="form-control" id="plan-date-input" onchange="loadPlanForDate()">
+      </div>
+      <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 16px 0;">
+      <div id="plan-form" style="display: grid; gap: 12px;">
+        <!-- Generated dynamically in JS -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-plan')">Hủy</button>
+      <button class="btn btn-primary" onclick="savePlan()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Xuất Báo Cáo -->
+<div class="modal-overlay" id="modal-export">
+  <div class="modal" style="max-width: 400px; margin: 50px auto;">
+    <div class="modal-header">
+      <h2 class="modal-title">📥 Xuất báo cáo Excel</h2>
+      <button class="modal-close" onclick="closeModal('modal-export')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom: 15px;">
+        <label>Chọn kiểu xuất:</label>
+        <select class="form-control" id="export-type" onchange="toggleExportInput()">
+          <option value="all">Tất cả dữ liệu</option>
+          <option value="month">Theo tháng</option>
+          <option value="date">Theo ngày</option>
+        </select>
+      </div>
+      <div class="form-group" id="export-month-group" style="display: none; margin-bottom: 15px;">
+        <label>Chọn tháng:</label>
+        <input type="month" class="form-control" id="export-month">
+      </div>
+      <div class="form-group" id="export-date-group" style="display: none; margin-bottom: 15px;">
+        <label>Chọn ngày:</label>
+        <input type="date" class="form-control" id="export-date">
+      </div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 15px; border-top: 1px solid var(--border-color);">
+      <button class="btn btn-outline" onclick="closeModal('modal-export')">Hủy</button>
+      <button class="btn btn-primary" onclick="downloadExcel()">Tải xuống CSV</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Tồn Kho -->
+<div class="modal-overlay" id="modal-inventory">
+  <div class="modal" style="max-width: 800px; margin: 50px auto; max-height: 90vh; display: flex; flex-direction: column;">
+    <div class="modal-header">
+      <h2 class="modal-title">📦 Quản lý tồn kho đóng gói</h2>
+      <button class="modal-close" onclick="closeModal('modal-inventory')">×</button>
+    </div>
+    <div class="modal-body" style="overflow-y: auto; flex: 1; padding-bottom: 20px;">
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button class="btn btn-primary" id="btn-tab-thanh-pham" onclick="switchInventoryTab('Đạt')">Ống thành phẩm</button>
+        <button class="btn btn-outline" id="btn-tab-hong" onclick="switchInventoryTab('Hỏng')">Ống hỏng</button>
+      </div>
+      <div id="inventory-content">
+        <!-- Content injected via JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="template.js?v=2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<!-- Firebase App (the core Firebase SDK) -->
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+<!-- Firebase Firestore -->
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="bundle_mapping.js?v=1"></script>
+<script src="app.js?v=8888"></script>
+
+<!-- Reset URL Button injected by Antigravity -->
+<div style="position: fixed; bottom: 10px; right: 10px; z-index: 9999;">
+    <button onclick="localStorage.removeItem('nkt_sync_url_v2'); localStorage.removeItem('nkt_sync_url_v3'); localStorage.removeItem('nkt_sync_url_v4'); localStorage.removeItem('nkt_sync_url'); alert('Đã xóa link đồng bộ cũ. Vui lòng tải lại trang và nhập link mới!'); location.reload();" 
+            style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: sans-serif; font-size: 12px; font-weight: bold;">
+        🔄 Đổi Link Đồng Bộ
+    </button>
+</div>
+
+</body>
+</html>

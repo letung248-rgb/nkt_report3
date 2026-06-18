@@ -1,0 +1,5 @@
+         ID       Ngày    Ca  ... Tình trạng  Thời gian nhận  Ghi chú
+0  VSP00001 2026-06-18  Ca 2  ...        Đạt        12:05:16      NaN
+1  VSP00002 2026-06-18  Ca 2  ...        Đạt        20:05:53      NaN
+
+[2 rows x 20 columns]

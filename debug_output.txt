@@ -1,0 +1,27 @@
+2026-06-07 - Đóng gói - Count: 11 - Tình trạng: Đạt
+2026-06-12 - Đóng gói - Count: 2 - Tình trạng: Đạt
+2026-06-07 - Đóng gói - Count: 1 - Tình trạng: Đạt
+2026-06-12 - Đóng gói - Count: 28 - Tình trạng: Đạt
+2026-06-07 - Đóng gói - Count: 47 - Tình trạng: Đạt
+2026-06-07 - NDT - Count: 63 - Tình trạng: Đạt
+2026-06-07 - Thông nòng - Count: 58 - Tình trạng: Đạt
+2026-06-07 - Rửa ống - Count: 23 - Tình trạng: Đạt
+2026-06-07 - Đầu vào - Count: 40 - Tình trạng: Đạt
+2026-06-07 - Làm sạch, calip ren - Count: 21 - Tình trạng: Đạt
+2026-06-07 - Rửa ống - Count: 31 - Tình trạng: Đạt
+2026-06-07 - Đầu vào - Count: 30 - Tình trạng: Đạt
+2026-06-11 - Tiện ren mới - Count: 13 - Tình trạng: TR
+2026-06-07 - Đầu vào - Count: 40 - Tình trạng: Đạt
+2026-06-11 - NDT - Count: 62 - Tình trạng: Đạt
+2026-06-11 - Ép thủy lực - Count: 1 - Tình trạng: XP
+2026-06-11 - Ép thủy lực - Count: 13 - Tình trạng: XB
+2026-06-11 - Ép thủy lực - Count: 41 - Tình trạng: XP,XB
+2026-06-11 - Thông nòng - Count: 46 - Tình trạng: Đạt
+2026-06-11 - Rửa ống - Count: 24 - Tình trạng: Đạt
+2026-06-11 - Đầu vào - Count: 40 - Tình trạng: Đạt
+2026-06-12 - Rửa ống - Count: 30 - Tình trạng: Đạt
+2026-06-12 - Đầu vào - Count: 35 - Tình trạng: Đạt
+2026-06-15 - Đóng gói - Count: 30 - Tình trạng: Đạt
+2026-06-15 - Rửa ống - Count: 13 - Tình trạng: Đạt
+2026-06-15 - Đầu vào - Count: 14 - Tình trạng: Đạt
+2026-06-15 - Đầu vào - Count: 35 - Tình trạng: Đạt

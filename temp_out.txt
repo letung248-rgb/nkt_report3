@@ -1,0 +1,60 @@
+    try {
+        const wb = new ExcelJS.Workbook();
+        
+        let wsData;
+        if (typeof EXCEL_TEMPLATE_B64 !== 'undefined') {
+            const res = await fetch("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + EXCEL_TEMPLATE_B64);
+            const ab = await res.arrayBuffer();
+            await wb.xlsx.load(ab);
+            wsData = wb.getWorksheet("Data") || wb.getWorksheet(1);
+            if (wsData) {
+                wsData.spliceRows(2, wsData.rowCount);
+            } else {
+                wsData = wb.addWorksheet("Data");
+            }
+        } else {
+            wb.addWorksheet("Tổng quan");
+            wb.addWorksheet("BC tháng");
+            wb.addWorksheet("BC ngày");
+            wsData = wb.addWorksheet("Dữ liệu NKT");
+        }
+
+        const headers = ["ID", "Ngày", "Ca", "Nguyên công", "Số lượng ống", "Số ống chi tiết", "Loại xử lý", "Số lần rửa", "Đồng hồ nước", "Loại ống", "Mã bó", "Khoang", "Từ giếng", "Từ giàn", "Hồ sơ giếng", "Người TH 1", "Người TH 2", "Tình trạng", "Thời gian nhận", "Ghi chú"];
+        wsData.getRow(1).values = headers;
+        
+        const headerRow = wsData.getRow(1);
+        headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
+        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+        
+        let rowIndex = 2;
+        dataToExport.forEach((r) => {
+            const text = r.soOngText ? r.soOngText.toString().trim() : '';
+            let pipes = parsePipesText(text);
+            const nguyenCongFull = r.nguyenCong;
+            let isRua = r.nguyenCong && r.nguyenCong.toLowerCase().includes('rửa');
+            let soLanRuaStr = isRua ? (r.soLanRua || 0) : "";
+            let dongHoNuocStr = isRua ? (r.dongHoNuoc || '') : "";
+            let idStr = "VSP" + String(rowIndex - 1).padStart(5, '0');
+
+            if (pipes.length === 0) {
+                const resolvedMaBo = getMaBoForRecord(r);
+                let tuGieng = (typeof BUNDLE_MAPPING !== 'undefined' && resolvedMaBo && BUNDLE_MAPPING[resolvedMaBo]) ? BUNDLE_MAPPING[resolvedMaBo].tuGieng : '';
+                let tuGian = (typeof BUNDLE_MAPPING !== 'undefined' && resolvedMaBo && BUNDLE_MAPPING[resolvedMaBo]) ? BUNDLE_MAPPING[resolvedMaBo].tuGian : '';
+                let hoSoGieng = (typeof BUNDLE_MAPPING !== 'undefined' && resolvedMaBo && BUNDLE_MAPPING[resolvedMaBo]) ? BUNDLE_MAPPING[resolvedMaBo].soBBGN : '';
+
+                wsData.addRow([
+                    idStr, formatDate(r.ngay), r.ca, nguyenCongFull, r.soOngCount, r.soOngText,
+                    r.loaiXl, soLanRuaStr, dongHoNuocStr, r.loaiOng, resolvedMaBo, r.khoang,
+                    "", "", "", r.nguoi1, r.nguoi2, r.tinhTrang, "", (r.ghiChu || '').replace(/
+/g, ' ')
+                ]);
+                rowIndex++;
+            } else {
+                for (let pipe of pipes) {
+                    const displayMaBo = r.maBo || findMaBoForPipe(pipe);
+                    let tuGieng = (typeof BUNDLE_MAPPING !== 'undefined' && displayMaBo && BUNDLE_MAPPING[displayMaBo]) ? BUNDLE_MAPPING[displayMaBo].tuGieng : '';
+                    let tuGian = (typeof BUNDLE_MAPPING !== 'undefined' && displayMaBo && BUNDLE_MAPPING[displayMaBo]) ? BUNDLE_MAPPING[displayMaBo].tuGian : '';
+                    let hoSoGieng = (typeof BUNDLE_MAPPING !== 'undefined' && displayMaBo && BUNDLE_MAPPING[displayMaBo]) ? BUNDLE_MAPPING[displayMaBo].soBBGN : '';
+
+                    wsData.addRow([

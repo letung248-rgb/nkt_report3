@@ -1,0 +1,65 @@
+0: nan - 1
+1: nan - HC
+2: nan - 73
+3: nan - 4181.05.26
+4: Từ giếng - 2106
+5: Từ giàn - BK-21
+6: Hồ sơ giếng - Ống kéo lên từ giếng
+7: Số BBGN - HKT-SC-25/26
+8: Ngày nhận - 2026-05-07 00:00:00
+9: Người nhận - Dương Minh Quân
+10: Khách hàng - XNKT
+11: Tình trạng - OK
+12: Mã bó nhận - 5/26A11
+13: Vị trí - X6
+14: Người thực hiện 1 - Hồ Xuân Hùng
+15: Người thực hiện 2 - Nguyễn Đức Huy
+16: Ngày/tháng - 2026-05-18 00:00:00
+17: Tình trạng - OK
+18: Người thực hiện - Phạm Văn Định
+19: Ngày/tháng - 2026-05-18 00:00:00
+20: Tình trạng - OK
+21: Người thực hiện - Nguyễn Thanh Hiền
+22: Ngày/tháng - 2026-05-18 00:00:00
+23: Chiều dày danh nghĩa - 5.51
+24: Chiều dày yêu cầu - 4.82125
+25: Đo chiều dày thực tế - 5.36
+26: Tình trạng - nan
+27: Người thực hiện - Lều Vĩnh An
+28: Ngày/tháng - 2026-05-18 00:00:00
+29: Tình trạng - nan
+30: Người thực hiện 1 - nan
+31: Người thực hiện 2 - nan
+32: Ngày/tháng - nan
+33: Áp suất ép (bar) - 350
+34: Tình trạng - OK
+35: Người thực hiện 1 - Lê Đình Phú
+36: Người thực hiện 2 - Lê Đình Hùng
+37: Ngày/tháng - 2026-05-20 00:00:00
+38: Mã bó ống
+thành phẩm - 135TP5.26
+39: Mã bó ống hỏng - nan
+40: Vị trí lưu ống
+(khoang số) - X6
+41: Người thực hiện - Trần Văn Hậu
+42: Ngày/tháng - 2026-05-20 00:00:00
+43: Tình trạng - nan
+44: Người thực hiện - nan
+45: Ngày/tháng - nan
+46: Tình trạng - nan
+47: Người thực hiện - nan
+48: Ngày/tháng - nan
+49: nan - nan
+50: nan - nan
+51: nan - nan
+52: nan - 4181
+53: nan - nan
+54: nan - nan
+55: nan - nan
+56: nan - nan
+57: nan - Tên cần tìm:
+58: nan - Nguyễn Đức Huy
+59: nan - nan
+60: nan - nan
+61: nan - Tổng ống đã làm:
+62: nan - 1382.0
